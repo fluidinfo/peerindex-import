@@ -8,9 +8,21 @@ For each screen name, we put the following into Fluidinfo onto the object
 whose about tag is the screenname in lowercase, preceeded by an @ sign:
 
   peerindex.com/updated-at
+  peerindex.com/activity
+  peerindex.com/audience
+  peerindex.com/authority
+  peerindex.com/peerindex
+  peerindex.com/realness
+  peerindex.com/name
+  peerindex.com/slug
+  peerindex.com/url
+  peerindex.com/topics
 
 The peerindex.com/updated-at tag is a (float) number of seconds from the
 epoch and records the time at which we added the data to Fluidinfo.
+
+The other peerindex.com tags have values that are identical to the values
+coming back from the PeerIndex API.
 
 To install
 ----------

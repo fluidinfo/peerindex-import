@@ -1,7 +1,7 @@
 Importing PeerIndex data to Fluidinfo
 ------------------------------------
 
-The file `import.py` reads Twitter screen names from stdin, looks up their
+The file import.py reads Twitter screen names from stdin, looks up their
 PeerIndex data using their API, and adds it to Fluidinfo.
 
 For each screen name, we put the following into Fluidinfo onto the object
@@ -29,16 +29,14 @@ To install
 
 Create a virtualenv and install the requirements:
 
-.. code-block:: sh
-
-    $ virtualenv --no-site-packages env
-    $ . env/bin/activate
-    $ pip install -r requirements.txt
+  $ virtualenv --no-site-packages env
+  $ . env/bin/activate
+  $ pip install -r requirements.txt
 
 To run
 ------
 
-You will need the `peerindex.com` user's password and a valid PeerIndex API
+You will need the peerindex.com user's password and a valid PeerIndex API
 key.  Put these in the environment variables FLUIDINFO_PEERINDEX_PASSWORD
 and PEERINDEX_API_KEY. Ask Terry for the values.
 

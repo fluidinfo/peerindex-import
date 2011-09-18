@@ -2,7 +2,8 @@ from json import dumps
 from unittest import TestCase
 
 from peerindex.client import (
-    PeerIndex, CredentialsError, RateLimitError, UnknownUserError)
+    PeerIndex, PeerIndexError, CredentialsError, RateLimitError,
+    UnknownUserError)
 from peerindex.tests.doubles import FakeHTTPClient, FakeTimeModule
 
 
@@ -168,3 +169,24 @@ class PeerIndexTest(TestCase):
         response.result(headers, content)
         peerindex = PeerIndex('key', client=client)
         self.assertRaises(UnknownUserError, peerindex.get, 'unknown')
+
+    def testGetWithUnexpectedError(self):
+        """
+        L{PeerIndex.get} raises a L{PeerIndexError} if an unexpected error
+        occurs while using the PeerIndex API.
+        """
+        client = FakeHTTPClient()
+        headers = {'status': '500', 'x-ratelimit-remaining': '9999',
+                   '-content-encoding': 'gzip', 'transfer-encoding': 'chunked',
+                   'content-length': '2', 'server': 'nginx/0.7.65',
+                   'connection': 'keep-alive', 'x-ratelimit-limit': '10000',
+                   'date': 'Sun, 18 Sep 2011 14:20:51 GMT',
+                   'content-type': 'application/json',
+                   'x-ratelimit-reset': '1316386800'}
+        content = dumps({'error': 'Something random just happened!'})
+        response = client.expect(
+            'http://api.peerindex.net/1/profile/show.json?'
+            'id=unknown&api_key=key')
+        response.result(headers, content)
+        peerindex = PeerIndex('key', client=client)
+        self.assertRaises(PeerIndexError, peerindex.get, 'unknown')

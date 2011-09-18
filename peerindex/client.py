@@ -21,7 +21,7 @@ from httplib2 import Http
 
 
 class PeerIndexError(Exception):
-    """Raise if an error occurs while interacting with the PeerIndex API."""
+    """Raised if an error occurs while interacting with the PeerIndex API."""
 
 
 class CredentialsError(PeerIndexError):
@@ -42,7 +42,7 @@ class PeerIndex(object):
     @param key: The API key to use when making requests to PeerIndex.
     @param client: Optionally, an C{httplib2.Http}-compatible object.  It's
         used for testing purposes.
-    @param timeModule: Optionally, an C{time}-compatible module object.  It's
+    @param timeModule: Optionally, a C{time}-compatible module object.  It's
         used for testing purposes.
     """
 
@@ -58,13 +58,15 @@ class PeerIndex(object):
     def get(self, name):
         """Get the PeerIndex profile for a Twitter user.
 
-        The PeerIndex API has a rate limit of 1 call per second and a maximum
-        of 10000 calls per day.  This method will invoke C{time.sleep} to
-        ensure the per second limit isn't exceeded.
+        The PeerIndex API has a rate limit of one call per second and a
+        maximum of 10000 calls per day.  This method will invoke C{time.sleep}
+        to ensure the per second limit isn't exceeded.
 
         @param name: The screen name of the Twitter user.
         @raise RateLimitError: Raised if the rate limit has been exceeded.
         @raise CredentialsError: Raised if an invalid API key is used.
+        @raise UnknownUserError: Raised if information about the specified
+            Twitter user isn't available.
         @raise PeerIndexError: Raised for any other type of error.
         @return: A C{dict} representing data about the user.  See the L{API
             docs<http://dev.peerindex.com/docs/profile/show>} for information
@@ -73,13 +75,15 @@ class PeerIndex(object):
         self._limitCallRate()
         uri = ('http://api.peerindex.net/1/profile/show.json?'
                'id=%s&api_key=%s' % (name, self._key))
-        response, contents = self._client.request(uri)
-        if response['status'] == '400':
+        headers, contents = self._client.request(uri)
+        if headers['status'] == '400':
             message = loads(contents)['error']
             exceptionClass = self.errors.get(message, PeerIndexError)
             raise exceptionClass(message)
-        elif response['status'] == '404':
+        elif headers['status'] == '404':
             raise UnknownUserError(name)
+        elif headers['status'] != '200':
+            raise PeerIndexError('%s: %s' % (headers, contents))
         else:
             return loads(contents)
 

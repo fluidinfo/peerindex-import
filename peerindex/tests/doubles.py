@@ -44,7 +44,7 @@ class FakeHTTPClient(object):
                 redirections=DEFAULT_MAX_REDIRECTS, connection_type=None):
         """A fake implementation of C{httplib2.Http.request}."""
         response = self._responses.pop(0)
-        assert(response.uri == uri, uri)
+        assert(response.uri == uri)
         assert(response.method == method)
         assert(response.body == body)
         assert(response.headers == headers)

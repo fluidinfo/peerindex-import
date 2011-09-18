@@ -72,6 +72,10 @@ class PeerIndex(object):
             docs<http://dev.peerindex.com/docs/profile/show>} for information
             about the returned keys.
         """
+        name = name.strip()
+        if name.startswith('@'):
+            name = name[1:]
+
         self._limitCallRate()
         uri = ('http://api.peerindex.net/1/profile/show.json?'
                'id=%s&api_key=%s' % (name, self._key))
@@ -80,7 +84,7 @@ class PeerIndex(object):
             message = loads(contents)['error']
             exceptionClass = self.errors.get(message, PeerIndexError)
             raise exceptionClass(message)
-        elif headers['status'] == '404':
+        elif headers['status'] == '404' or '404 Not Found' in contents:
             raise UnknownUserError(name)
         elif headers['status'] != '200':
             raise PeerIndexError('%s: %s' % (headers, contents))

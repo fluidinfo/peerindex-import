@@ -37,6 +37,65 @@ class PeerIndexTest(TestCase):
         peerindex = PeerIndex('key', client=client)
         self.assertEqual(result, peerindex.get('terrycojones'))
 
+    def testGetStripsLeadingAtSignInUsername(self):
+        """
+        L{PeerIndex.get} automatically strips a leading C{@} sign out of a
+        username, since passing it to the API will result in a 404.
+        """
+        client = FakeHTTPClient()
+        headers = {'status': '200', 'x-ratelimit-remaining': '9998',
+                   'content-location': 'http://api.peerindex.net/...',
+                   '-content-encoding': 'gzip', 'transfer-encoding': 'chunked',
+                   'content-length': '238', 'server': 'nginx/0.7.65',
+                   'connection': 'keep-alive', 'x-ratelimit-limit': '10000',
+                   'date': 'Sun, 18 Sep 2011 14:25:33 GMT',
+                   'content-type': 'application/json',
+                   'x-ratelimit-reset': '1316386800'}
+        result = {'name': 'Terry Jones', 'twitter': 'terrycojones',
+                  'slug': 'terrycojones', 'known': 1, 'authority': 51,
+                  'activity': 46, 'audience': 57, 'peerindex': 52,
+                  'url': 'http:\\/\\/pi.mu\\/4O9',
+                  'topics': ['languages', 'terry jones', 'catalonia',
+                             'tim oreilly', 'writing']}
+        content = dumps(result)
+        response = client.expect(
+            'http://api.peerindex.net/1/profile/show.json?'
+            'id=terrycojones&api_key=key')
+        response.result(headers, content)
+        peerindex = PeerIndex('key', client=client)
+        self.assertEqual(result, peerindex.get('@terrycojones'))
+
+    def testGetStripsTrailingWhitespaceInUsername(self):
+        """
+        L{PeerIndex.get} automatically strips trailing whitespace from a
+        username, since passing a username with trailing whitespace to the API
+        can result in strange behaviour.  For example, at the time of this
+        writing, a username with a trailing newline will result in an HTTP 200
+        status code with HTML representing a 404 as the response contents.
+        """
+        client = FakeHTTPClient()
+        headers = {'status': '200', 'x-ratelimit-remaining': '9998',
+                   'content-location': 'http://api.peerindex.net/...',
+                   '-content-encoding': 'gzip', 'transfer-encoding': 'chunked',
+                   'content-length': '238', 'server': 'nginx/0.7.65',
+                   'connection': 'keep-alive', 'x-ratelimit-limit': '10000',
+                   'date': 'Sun, 18 Sep 2011 14:25:33 GMT',
+                   'content-type': 'application/json',
+                   'x-ratelimit-reset': '1316386800'}
+        result = {'name': 'Terry Jones', 'twitter': 'terrycojones',
+                  'slug': 'terrycojones', 'known': 1, 'authority': 51,
+                  'activity': 46, 'audience': 57, 'peerindex': 52,
+                  'url': 'http:\\/\\/pi.mu\\/4O9',
+                  'topics': ['languages', 'terry jones', 'catalonia',
+                             'tim oreilly', 'writing']}
+        content = dumps(result)
+        response = client.expect(
+            'http://api.peerindex.net/1/profile/show.json?'
+            'id=terrycojones&api_key=key')
+        response.result(headers, content)
+        peerindex = PeerIndex('key', client=client)
+        self.assertEqual(result, peerindex.get('terrycojones\n'))
+
     def testGetSleepsToHonourRateLimit(self):
         """
         The PeerIndex API limits calls to 1 per second.  L{PeerIndex.get}

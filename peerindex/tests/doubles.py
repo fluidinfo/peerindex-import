@@ -33,7 +33,8 @@ class FakeHTTPClient(object):
     def expect(self, uri, method='GET', body=None, headers=None,
                redirections=DEFAULT_MAX_REDIRECTS, connection_type=None):
         """
-        Specify the values that expected when the L{request} method is called.
+        Specify the values that are expected when the L{request} method is
+        called.
         """
         response = FakeHTTPResponse(uri, method, body, headers, redirections,
                                     connection_type)

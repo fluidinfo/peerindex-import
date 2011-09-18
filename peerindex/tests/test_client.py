@@ -36,7 +36,7 @@ class PeerIndexTest(TestCase):
         peerindex = PeerIndex('key', client=client)
         self.assertEqual(result, peerindex.get('terrycojones'))
 
-    def testGetManagesCallRate(self):
+    def testGetSleepsToHonourRateLimit(self):
         """
         The PeerIndex API limits calls to 1 per second.  L{PeerIndex.get}
         sleeps between calls to ensure this limit is honoured.
@@ -73,6 +73,44 @@ class PeerIndexTest(TestCase):
         # A sleep is performed between calls, with 0.05s of extra time, to
         # ensure that we don't exceed the per-call rate limit.
         self.assertEqual(0.80, timeModule.lastSleep)
+
+    def testGetOnlySleepsWhenNecessary(self):
+        """
+        L{PeerIndex.get} doesn't sleep if more than one second has passed
+        between API calls.
+        """
+        timeModule = FakeTimeModule()
+        client = FakeHTTPClient()
+        headers = {'status': '200'}
+        result = {'name': 'Terry Jones', 'twitter': 'terrycojones',
+                  'slug': 'terrycojones', 'known': 1, 'authority': 51,
+                  'activity': 46, 'audience': 57, 'peerindex': 52,
+                  'url': 'http:\\/\\/pi.mu\\/4O9',
+                  'topics': ['languages', 'terry jones', 'catalonia',
+                             'tim oreilly', 'writing']}
+        content = dumps(result)
+        response = client.expect(
+            'http://api.peerindex.net/1/profile/show.json?'
+            'id=terrycojones&api_key=key')
+        response.result(headers, content)
+        peerindex = PeerIndex('key', client=client, timeModule=timeModule)
+        self.assertEqual(result, peerindex.get('terrycojones'))
+        # No sleep occurs during the first call, because there's no rate
+        # limiting to do yet.
+        self.assertEqual(None, timeModule.lastSleep)
+        self.assertEqual(100.0, peerindex._lastCallTime)
+
+        # Bump the current time by 5s to simulate time being spent handling
+        # the first request.
+        timeModule.currentTime = 105.0
+        response = client.expect(
+            'http://api.peerindex.net/1/profile/show.json?'
+            'id=terrycojones&api_key=key')
+        response.result(headers, content)
+        self.assertEqual(result, peerindex.get('terrycojones'))
+        # No sleep occurs because more than one second has passed since the
+        # last API call.
+        self.assertEqual(None, timeModule.lastSleep)
 
     def testGetWithBadCredentials(self):
         """

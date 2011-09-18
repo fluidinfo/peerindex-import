@@ -1,4 +1,18 @@
-"""A client for the PeerIndex API."""
+"""A client for the PeerIndex API.
+
+The PeerIndex API has a single C{profile/show} method to get information about
+a particular Twitter user::
+
+  peerindex = PeerIndex('your-api-key')
+  result = peerindex.get('twitter-user')
+
+The C{dict} returns by this method includes the keys described here:
+
+  http://dev.peerindex.com/docs/profile/show
+
+The PeerIndex API has a one call per second rate limit.  Calls to
+L{PeerIndex.get} will sleep to ensure this limit is honoured.
+"""
 
 from json import loads
 import time
@@ -72,8 +86,8 @@ class PeerIndex(object):
     def _limitCallRate(self):
         """Ensure we don't exceed one call per second.
 
-        if this is the first API call, nothing be done.  Otherwise, a sleep
-        will be performed, to ensure we don't exceed the one call per second
+        If this is the first API call, nothing is done, otherwise, a sleep
+        will be performed to ensure we don't exceed the one call per second
         rate limit.
         """
         if self._lastCallTime is not None:

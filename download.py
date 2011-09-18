@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import logging
+from json import dumps
 import sys
 
 from peerindex.client import PeerIndex, PeerIndexError, RateLimitError
@@ -44,7 +45,7 @@ def main(key, inputPath, outputPath):
         names = [line.strip() for line in inputFile]
     for result in getProfiles(peerindex, names):
         with open(outputPath, 'a') as outputFile:
-            print >> outputFile, result
+            print >> outputFile, dumps(result)
 
 
 if __name__ == '__main__':

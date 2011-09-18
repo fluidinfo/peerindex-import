@@ -51,3 +51,23 @@ class FakeHTTPClient(object):
         assert(response.redirections == redirections)
         assert(response.connection_type == connection_type)
         return response.response
+
+
+class FakeTimeModule(object):
+    """A fake C{time} module.
+
+    @param currentTime: Optionally, the current time.  Defaults to 100.0.
+    """
+
+    def __init__(self, currentTime=None):
+        self.currentTime = currentTime or 100.0
+        self.lastSleep = None
+
+    def sleep(self, seconds):
+        """Sleep for the specified number of seconds."""
+        self.lastSleep = seconds
+        self.currentTime += seconds
+
+    def time(self):
+        """Get the current time."""
+        return self.currentTime

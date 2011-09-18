@@ -10,3 +10,6 @@ pyflakes:
 
 clean:
 	find . -name '*~' -o -name '*.pyc' -print0 | xargs -0 -r rm
+
+check:
+	trial peerindex

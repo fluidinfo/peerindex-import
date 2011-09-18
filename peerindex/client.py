@@ -1,6 +1,5 @@
 """A client for the PeerIndex API."""
 
-from datetime import datetime, timedelta
 from json import loads
 import time
 
@@ -29,14 +28,17 @@ class PeerIndex(object):
     @param key: The API key to use when making requests to PeerIndex.
     @param client: Optionally, an C{httplib2.Http}-compatible object.  It's
         used for testing purposes.
+    @param timeModule: Optionally, an C{time}-compatible module object.  It's
+        used for testing purposes.
     """
 
     errors = {'Rate limit exceeded': RateLimitError,
               'Invalid API key': CredentialsError}
 
-    def __init__(self, key, client=None):
+    def __init__(self, key, client=None, timeModule=None):
         self._key = key
         self._client = client or Http()
+        self._timeModule = timeModule or time
         self._lastCallTime = None
 
     def get(self, name):
@@ -54,10 +56,7 @@ class PeerIndex(object):
             docs<http://dev.peerindex.com/docs/profile/show>} for information
             about the returned keys.
         """
-        # if self._lastCallTime:
-        #     delta = self._lastCallTime - datetime.utcnow()
-        #     if delta < timedelta(seconds=1):
-        #         time.sleep(delta.seconds)
+        self._limitCallRate()
         uri = ('http://api.peerindex.net/1/profile/show.json?'
                'id=%s&api_key=%s' % (name, self._key))
         response, contents = self._client.request(uri)
@@ -69,3 +68,17 @@ class PeerIndex(object):
             raise UnknownUserError(name)
         else:
             return loads(contents)
+
+    def _limitCallRate(self):
+        """Ensure we don't exceed one call per second.
+
+        if this is the first API call, nothing be done.  Otherwise, a sleep
+        will be performed, to ensure we don't exceed the one call per second
+        rate limit.
+        """
+        if self._lastCallTime is not None:
+            now = self._timeModule.time()
+            delta = now - self._lastCallTime
+            if delta < 1.0:
+                self._timeModule.sleep(1.0 - delta + 0.05)
+        self._lastCallTime = self._timeModule.time()

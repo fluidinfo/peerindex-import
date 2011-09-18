@@ -80,7 +80,7 @@ class PeerIndex(object):
         uri = ('http://api.peerindex.net/1/profile/show.json?'
                'id=%s&api_key=%s' % (name, self._key))
         headers, contents = self._client.request(uri)
-        if headers['status'] == '400':
+        if headers['status'] == '400' or headers['status'] == '403':
             message = loads(contents)['error']
             exceptionClass = self.errors.get(message, PeerIndexError)
             raise exceptionClass(message)

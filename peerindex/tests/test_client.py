@@ -196,7 +196,7 @@ class PeerIndexTest(TestCase):
         has been reached.
         """
         client = FakeHTTPClient()
-        headers = {'status': '400', 'transfer-encoding': 'chunked',
+        headers = {'status': '403', 'transfer-encoding': 'chunked',
                    'server': 'nginx/0.7.65', 'connection': 'keep-alive',
                    'date': 'Sun, 18 Sep 2011 13:06:03 GMT',
                    'content-type': 'application/json'}

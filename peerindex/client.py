@@ -6,7 +6,7 @@ a particular Twitter user::
   peerindex = PeerIndex('your-api-key')
   result = peerindex.get('twitter-user')
 
-The C{dict} returns by this method includes the keys described here:
+The C{dict} returned by this method includes the keys described here:
 
   http://dev.peerindex.com/docs/profile/show
 

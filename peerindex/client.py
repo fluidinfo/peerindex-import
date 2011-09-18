@@ -95,8 +95,7 @@ class PeerIndex(object):
         rate limit.
         """
         if self._lastCallTime is not None:
-            now = self._timeModule.time()
-            delta = now - self._lastCallTime
+            delta = self._timeModule.time() - self._lastCallTime
             if delta < 1.0:
-                self._timeModule.sleep(1.0 - delta + 0.05)
+                self._timeModule.sleep(1.0 - delta)
         self._lastCallTime = self._timeModule.time()

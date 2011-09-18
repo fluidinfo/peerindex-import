@@ -61,7 +61,6 @@ class PeerIndexTest(TestCase):
         # No sleep occurs during the first call, because there's no rate
         # limiting to do yet.
         self.assertEqual(None, timeModule.lastSleep)
-        self.assertEqual(100.0, peerindex._lastCallTime)
 
         # Bump the current time by 0.25s to simulate time being spent handling
         # the first request.
@@ -73,7 +72,7 @@ class PeerIndexTest(TestCase):
         self.assertEqual(result, peerindex.get('terrycojones'))
         # A sleep is performed between calls, with 0.05s of extra time, to
         # ensure that we don't exceed the per-call rate limit.
-        self.assertEqual(0.80, timeModule.lastSleep)
+        self.assertEqual(0.75, timeModule.lastSleep)
 
     def testGetOnlySleepsWhenNecessary(self):
         """
@@ -99,7 +98,6 @@ class PeerIndexTest(TestCase):
         # No sleep occurs during the first call, because there's no rate
         # limiting to do yet.
         self.assertEqual(None, timeModule.lastSleep)
-        self.assertEqual(100.0, peerindex._lastCallTime)
 
         # Bump the current time by 5s to simulate time being spent handling
         # the first request.

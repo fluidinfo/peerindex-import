@@ -151,7 +151,7 @@ class PeerIndexTest(TestCase):
 
     def testGetWithUnknownUser(self):
         """
-        L{PeerIndex.get} raises a L{UnknownUserError} if the PeerIndex API
+        L{PeerIndex.get} raises an L{UnknownUserError} if the PeerIndex API
         doesn't have information about the specified user.
         """
         client = FakeHTTPClient()

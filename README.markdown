@@ -8,8 +8,9 @@ The file `import.py` reads Twitter screen names from stdin, looks up their
 PeerIndex data using their API, and adds it to Fluidinfo.
 
 For each screen name, we put the following into Fluidinfo onto the object
-whose about tag is the screenname in lowercase, preceeded by an @ sign:
+whose about tag is the screenname in lowercase, preceeded by an `@` sign:
 
+<pre>
   peerindex.com/updated-at
   peerindex.com/activity
   peerindex.com/audience
@@ -20,6 +21,7 @@ whose about tag is the screenname in lowercase, preceeded by an @ sign:
   peerindex.com/slug
   peerindex.com/url
   peerindex.com/topics
+</pre>
 
 The peerindex.com/updated-at tag is a (float) number of seconds from the
 epoch and records the time at which we added the data to Fluidinfo.
@@ -39,9 +41,11 @@ To install
 
 Create a virtualenv and install the requirements:
 
+<pre>
   $ virtualenv --no-site-packages env
   $ . env/bin/activate
   $ pip install -r requirements.txt
+</pre>
 
 To run
 ------

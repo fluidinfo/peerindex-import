@@ -4,3 +4,4 @@ distribute-*.tar.gz
 pip-log.txt
 env
 _trial_temp
+*~

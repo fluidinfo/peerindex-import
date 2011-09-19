@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+# See README.markdown for usage instructions.
+
 from datetime import datetime
 import json
 import os
